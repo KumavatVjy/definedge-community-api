@@ -1,0 +1,17 @@
+{
+  "id": "nodebb-plugin-definedge-community-api",
+  "name": "Definedge Community API",
+  "description": "API Layer between NodeBB and Definedge Next.js Application.",
+  "url": "https://github.com/KumavatVjy/definedge-community-api",
+  "library": "./library.js",
+  "hooks": [
+    {
+      "hook": "static:app.load",
+      "method": "init"
+    }
+  ],
+  "staticDirs": {},
+  "less": [],
+  "scripts": [],
+  "templates": []
+}

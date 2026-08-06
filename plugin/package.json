@@ -1,0 +1,22 @@
+{
+  "name": "nodebb-plugin-definedge-community-api",
+  "version": "0.1.0",
+  "description": "Definedge Community API Plugin for NodeBB",
+  "main": "library.js",
+  "author": "Definedge",
+  "license": "MIT",
+  "keywords": [
+    "nodebb",
+    "plugin",
+    "community",
+    "api",
+    "definedge"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "lint": "echo \"Lint will be added later\"",
+    "test": "echo \"Tests will be added later\""
+  }
+}
