@@ -96,6 +96,166 @@ class NodeBBTopicRepository extends BaseRepository {
         return posts || [];
     }
 
+    /**
+     * Create a topic in NodeBB
+     * @param {Object} options
+     * @param {number} options.cid
+     * @param {string} options.title
+     * @param {string} options.content
+     * @param {number} options.uid
+     * @returns {Promise<Object>}
+     */
+    async createTopic(options = {}) {
+        const result = await this.topics.post({
+            cid: options.cid,
+            title: options.title,
+            content: options.content,
+            uid: options.uid
+        });
+
+        return {
+            tid: result.topicData.tid,
+            slug: result.topicData.slug
+        };
+    }
+
+    /**
+     * Reply to a topic in NodeBB
+     * @param {Object} options
+     * @param {number} options.tid
+     * @param {string} options.content
+     * @param {number} options.uid
+     * @param {number} [options.toPid]
+     * @returns {Promise<Object>}
+     */
+    async replyToTopic(options = {}) {
+        const payload = {
+            tid: options.tid,
+            content: options.content,
+            uid: options.uid
+        };
+
+        if (options.toPid) {
+            payload.toPid = options.toPid;
+        }
+
+        const postData = await this.topics.reply(payload);
+        return postData;
+    }
+
+    /**
+     * Watch/Follow a topic in NodeBB
+     * @param {number} tid
+     * @param {number} uid
+     * @returns {Promise<void>}
+     */
+    async watch(tid, uid) {
+        return await this.topics.follow(tid, uid);
+    }
+
+    /**
+     * Unwatch/Unfollow a topic in NodeBB
+     * @param {number} tid
+     * @param {number} uid
+     * @returns {Promise<void>}
+     */
+    async unwatch(tid, uid) {
+        return await this.topics.unfollow(tid, uid);
+    }
+
+    /**
+     * Check if user is watching/following a topic in NodeBB
+     * @param {number} tid
+     * @param {number} uid
+     * @returns {Promise<boolean>}
+     */
+    async isWatching(tid, uid) {
+        const result = await this.topics.isFollowing([tid], uid);
+        return Array.isArray(result) ? result[0] === true : false;
+    }
+
+    /**
+     * Get deletion status of a topic in NodeBB
+     * @param {number|string} tid
+     * @returns {Promise<Object>}
+     */
+    async getDeletionStatus(tid) {
+        const numericTid = parseInt(tid, 10);
+
+        if (!numericTid || numericTid <= 0) {
+            return {
+                deleted: false,
+                deleterUid: null,
+                deletedTimestamp: null
+            };
+        }
+
+        const data = await this.topics.getTopicsFields(
+            [numericTid],
+            ['deleted', 'deleterUid', 'deletedTimestamp']
+        );
+
+        const topic = data && data[0];
+
+        return {
+            deleted: Boolean(topic && Number(topic.deleted)),
+            deleterUid:
+                topic && Number(topic.deleterUid) > 0
+                    ? Number(topic.deleterUid)
+                    : null,
+            deletedTimestamp:
+                topic && Number(topic.deletedTimestamp) > 0
+                    ? Number(topic.deletedTimestamp)
+                    : null
+        };
+    }
+
+    /**
+     * Get deletion status for multiple topics in batch
+     * @param {Array<number|string>} tids
+     * @returns {Promise<Object<number, Object>>}
+     */
+    async getDeletionStatuses(tids = []) {
+        if (!Array.isArray(tids) || !tids.length) {
+            return {};
+        }
+
+        const numericTids = [...new Set(
+            tids
+                .map(tid => parseInt(tid, 10))
+                .filter(tid => tid > 0)
+        )];
+
+        if (!numericTids.length) {
+            return {};
+        }
+
+        const topicsData = await this.topics.getTopicsFields(
+            numericTids,
+            ['deleted', 'deleterUid', 'deletedTimestamp']
+        );
+
+        const result = {};
+
+        numericTids.forEach((tid, index) => {
+            const topic = (topicsData && topicsData[index]) || {};
+
+            result[tid] = {
+                deleted: Boolean(topic && Number(topic.deleted)),
+                deleterUid:
+                    topic && Number(topic.deleterUid) > 0
+                        ? Number(topic.deleterUid)
+                        : null,
+                deletedTimestamp:
+                    topic && Number(topic.deletedTimestamp) > 0
+                        ? Number(topic.deletedTimestamp)
+                        : null
+            };
+        });
+
+        return result;
+    }
+
 }
 
 module.exports = NodeBBTopicRepository;

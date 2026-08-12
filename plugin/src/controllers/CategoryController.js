@@ -4,6 +4,7 @@ const BaseController = require('./BaseController');
 const Container = require('../container');
 const ContainerKeys = require('../constants/ContainerKeys');
 const ApiMessages = require('../constants/ApiMessages');
+const HttpStatus = require('../constants/HttpStatus');
 const CategoryValidator = require('../validators/CategoryValidator');
 
 class CategoryController extends BaseController {
@@ -24,7 +25,7 @@ class CategoryController extends BaseController {
         const service = this.getCategoryService();
         const categories = await service.getCategories({ uid });
 
-        return this.sendSuccess(res, ApiMessages.CATEGORIES_FETCHED, categories);
+        return this.sendSuccess(res, ApiMessages.CATEGORIES_FETCHED, categories, HttpStatus.OK);
     }
 
     /**
@@ -36,7 +37,7 @@ class CategoryController extends BaseController {
         const service = this.getCategoryService();
         const category = await service.getCategoryById(cid, { uid });
 
-        return this.sendSuccess(res, ApiMessages.CATEGORY_DETAILS_FETCHED, category);
+        return this.sendSuccess(res, ApiMessages.CATEGORY_DETAILS_FETCHED, category, HttpStatus.OK);
     }
 
     /**
@@ -53,7 +54,7 @@ class CategoryController extends BaseController {
             uid
         });
 
-        return this.sendSuccess(res, ApiMessages.CATEGORY_TOPICS_FETCHED, data);
+        return this.sendSuccess(res, ApiMessages.CATEGORY_TOPICS_FETCHED, data, HttpStatus.OK);
     }
 
     /**
@@ -64,7 +65,7 @@ class CategoryController extends BaseController {
         const service = this.getCategoryService();
         const stats = await service.getCategoryStats(cid);
 
-        return this.sendSuccess(res, ApiMessages.CATEGORY_STATISTICS_FETCHED, stats);
+        return this.sendSuccess(res, ApiMessages.CATEGORY_STATISTICS_FETCHED, stats, HttpStatus.OK);
     }
 
 }

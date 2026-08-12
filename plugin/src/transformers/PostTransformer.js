@@ -1,5 +1,8 @@
 'use strict';
 
+const UserBanTransformer = require('./UserBanTransformer');
+const PostDeletionTransformer = require('./PostDeletionTransformer');
+
 class PostTransformer {
 
     /**
@@ -10,19 +13,39 @@ class PostTransformer {
     static transform(post) {
         if (!post) return null;
 
+        const moderation = post.moderation || {
+            flagged: Boolean(post.flagId || post.flagged),
+            reportedByMe: Boolean(post.reportedByMe),
+            flagState: post.flagState || null
+        };
+
+        const authorUser = post.user || {};
+        const authorModeration = authorUser.moderation
+            ? UserBanTransformer.transform(authorUser.moderation)
+            : UserBanTransformer.transform({
+                banned: Boolean(authorUser.banned),
+                banExpiresAt: authorUser['banned:expire'] || authorUser.banExpiresAt || null
+            });
+
+        const deletionStatus = post.deletion
+            ? PostDeletionTransformer.transform(post.deletion)
+            : PostDeletionTransformer.transform({ deleted: post.deleted });
+
         return {
             id: post.pid,
             tid: post.tid,
             content: post.content || '',
             author: {
-                uid: post.uid,
-                username: post.user ? post.user.username : '',
-                slug: post.user ? post.user.userslug : '',
-                picture: post.user ? post.user.picture : null
+                uid: post.uid || authorUser.uid || 0,
+                username: authorUser.username || '',
+                slug: authorUser.userslug || '',
+                picture: authorUser.picture || null,
+                moderation: authorModeration
             },
             likes: post.upvotes || 0,
             timestamp: post.timestamp ? new Date(post.timestamp).toISOString() : null,
-            deleted: Boolean(post.deleted)
+            deleted: Boolean(deletionStatus.deleted),
+            moderation
         };
     }
 

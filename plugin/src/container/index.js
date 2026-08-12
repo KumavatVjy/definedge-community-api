@@ -4,6 +4,9 @@ const Logger = require('../helpers/Logger');
 const registerHealthModule = require('./registrations/health');
 const registerCategoryModule = require('./registrations/category');
 const registerTopicModule = require('./registrations/topic');
+const registerPostModule = require('./registrations/post');
+const registerUserModule = require('./registrations/user');
+const registerSearchModule = require('./registrations/search');
 
 class Container {
 
@@ -26,6 +29,15 @@ class Container {
 
         // Register Topic module
         registerTopicModule(this);
+
+        // Register Post module
+        registerPostModule(this);
+
+        // Register User module
+        registerUserModule(this);
+
+        // Register Search module
+        registerSearchModule(this);
 
     }
 

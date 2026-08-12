@@ -14,8 +14,9 @@ module.exports = function registerTopicModule(container) {
     Logger.info('Registering Topic module dependencies...');
 
     const topicRepository = new NodeBBTopicRepository();
+    const categoryRepository = container.get(ContainerKeys.REPOSITORIES.CATEGORY);
 
-    const topicService = new TopicService(topicRepository);
+    const topicService = new TopicService(topicRepository, categoryRepository);
 
     container.set(ContainerKeys.REPOSITORIES.TOPIC, topicRepository);
 

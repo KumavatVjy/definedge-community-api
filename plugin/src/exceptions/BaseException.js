@@ -1,7 +1,9 @@
 'use strict';
 
+const HttpStatus = require('../constants/HttpStatus');
+
 class BaseException extends Error {
-    constructor(message = 'An unexpected error occurred.', statusCode = 500, errors = null) {
+    constructor(message, statusCode = HttpStatus.INTERNAL_SERVER_ERROR, errors = null) {
         super(message);
         this.name = this.constructor.name;
         this.statusCode = statusCode;

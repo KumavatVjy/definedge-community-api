@@ -1,11 +1,12 @@
 'use strict';
 
 const BaseException = require('./BaseException');
+const HttpStatus = require('../constants/HttpStatus');
 const ApiMessages = require('../constants/ApiMessages');
 
 class ValidationException extends BaseException {
     constructor(message = ApiMessages.VALIDATION_FAILED, errors = null) {
-        super(message, 400, errors);
+        super(message, HttpStatus.BAD_REQUEST, errors);
     }
 }
 

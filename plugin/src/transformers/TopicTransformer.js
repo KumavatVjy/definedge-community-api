@@ -1,5 +1,8 @@
 'use strict';
 
+const UserBanTransformer = require('./UserBanTransformer');
+const TopicDeletionTransformer = require('./TopicDeletionTransformer');
+
 class TopicTransformer {
 
     /**
@@ -13,6 +16,21 @@ class TopicTransformer {
         const authorName = topic.user
             ? (topic.user.username || topic.user.displayname || topic.user.userslug || `user_${topic.uid}`)
             : (topic.username || `user_${topic.uid || 0}`);
+
+        const authorUser = topic.user || {};
+        const authorModeration = authorUser.moderation
+            ? UserBanTransformer.transform(authorUser.moderation)
+            : UserBanTransformer.transform({
+                banned: Boolean(authorUser.banned),
+                banExpiresAt: authorUser['banned:expire'] || authorUser.banExpiresAt || null
+            });
+
+        const deletionStatus = topic.deletion
+            ? TopicDeletionTransformer.transform(topic.deletion)
+            : TopicDeletionTransformer.transform({
+                deleted: topic.deleted,
+                deletedTimestamp: topic.deletedTimestamp
+            });
 
         const postCount = topic.postcount || 0;
         const replyCount = postCount > 1 ? postCount - 1 : 0;
@@ -30,6 +48,12 @@ class TopicTransformer {
             picture: topic.user.picture || null
         } : null);
 
+        const moderation = topic.moderation || {
+            flagged: Boolean(topic.flagged),
+            reportedByMe: Boolean(topic.reportedByMe),
+            flagState: topic.flagState || null
+        };
+
         return {
             id: topic.tid,
             title: topic.title,
@@ -39,8 +63,9 @@ class TopicTransformer {
                 name: topic.category ? topic.category.name : ''
             },
             author: {
-                uid: topic.uid || 0,
-                username: authorName
+                uid: topic.uid || authorUser.uid || 0,
+                username: authorName,
+                moderation: authorModeration
             },
             posts: postCount,
             replyCount,
@@ -48,9 +73,13 @@ class TopicTransformer {
             likes: topic.upvotes || 0,
             isPinned: Boolean(topic.pinned),
             isLocked: Boolean(topic.locked),
+            timestamp: topic.timestamp ? new Date(topic.timestamp).toISOString() : null,
             lastReplyAt: topic.lastposttime ? new Date(topic.lastposttime).toISOString() : null,
             lastPostTimestamp: topic.lastposttime ? new Date(topic.lastposttime).toISOString() : null,
-            lastPostUser
+            lastPostUser,
+            deleted: Boolean(deletionStatus.deleted),
+            deletedAt: deletionStatus.deletedAt || null,
+            moderation
         };
     }
 
