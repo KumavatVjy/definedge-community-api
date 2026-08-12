@@ -15,7 +15,7 @@ Sprint 7 – API Completeness & Contract Standardization - COMPLETED & FROZEN �
 | 5.4 Followers | ✅ |
 | 5.5 Following | ✅ |
 | 5.6 Statistics | ✅ |
-| 5.7 Activity | 🟡 Pagination depth limitation |
+| 5.7 Activity | ✅ (Depth-bounded offset pagination) |
 
 ---
 
@@ -50,7 +50,7 @@ Sprint 7 – API Completeness & Contract Standardization - COMPLETED & FROZEN �
 | Following | ✅ |
 | Statistics | ✅ |
 | Engagement Stats | ✅ |
-| Activity | 🟡 Pagination depth limitation |
+| Activity | ✅ (With Moderation & Ban Enrichment) |
 | Dashboard | ⏳ |
 | Likes | ✅ |
 | Bookmarks | ✅ |
